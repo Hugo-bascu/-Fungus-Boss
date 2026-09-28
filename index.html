@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HOWULOOK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-page: #0f0b12;
+    --ink-page: #efe7e2;
+    --brass: #c9a15a;
+    --brass-dim: #8f7748;
+    --blush: #e3aeb0;
+    --plum-900: #1c1420;
+    --plum-800: #241a29;
+    --plum-700: #2f2233;
+    --plum-600: #3c2c41;
+    --cream: #f3ede7;
+    --cream-dim: #b9aca7;
+    --line: #493a4d;
+    --danger: #d97878;
+    --ok: #8db28a;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg-page);
+    color: var(--ink-page);
+    font-family: 'Work Sans', system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 32px 16px 48px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg-page: #eee7dd;
+      --ink-page: #241a29;
+    }
+  }
+
+  .device {
+    width: 100%;
+    max-width: 390px;
+    height: min(844px, 92vh);
+    background:
+      radial-gradient(circle at 12% 0%, rgba(201,161,90,.07), transparent 40%),
+      radial-gradient(circle at 100% 100%, rgba(227,174,176,.05), transparent 45%),
+      var(--plum-900);
+    border-radius: 40px;
+    border: 10px solid #0a070c;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .notch {
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 22px;
+    background: #0a070c;
+    border-radius: 0 0 16px 16px;
+    z-index: 50;
+  }
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 40px 22px 22px;
+  }
+  .screen.active { display: flex; animation: fadeIn .35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+  @media (prefers-reduced-motion: reduce) {
+    .screen.active { animation: none; }
+    * { transition: none !important; }
+  }
+
+  /* ---------- Typography ---------- */
+  h1, h2, h3 { font-family: 'Fraunces', serif; margin: 0; color: var(--cream); font-weight: 500; }
+  p { margin: 0; line-height: 1.5; }
+  .muted { color: var(--cream-dim); }
+
+  /* ---------- Splash ---------- */
+  #screen-splash {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(201,161,90,.14), transparent 55%),
+      radial-gradient(circle at 75% 80%, rgba(227,174,176,.10), transparent 50%),
+      var(--plum-900);
+  }
+  .brandmark {
+    width: 108px; height: 108px;
+    border-radius: 50%;
+    background: #0a070c;
+    border: 2px solid var(--brass);
+    box-shadow: 0 0 0 5px rgba(201,161,90,.08);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 26px;
+  }
+  .brandmark svg { width: 58px; height: 58px; }
+  .brand-name {
+    font-size: 40px;
+    letter-spacing: 0.5px;
+    color: var(--cream);
+  }
+  .brand-tagline {
+    font-size: 14.5px;
+    color: var(--brass);
+    font-style: italic;
+    font-family: 'Fraunces', serif;
+    margin-top: 6px;
+  }
+  .btn-start {
+    margin-top: 40px;
+    background: var(--brass);
+    color: #1c1420;
+    border: none;
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: 15.5px;
+    padding: 14px 46px;
+    border-radius: 100px;
+    cursor: pointer;
+    letter-spacing: .2px;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .btn-start:active { transform: scale(.96); }
+  .btn-start:hover { background: #d9b06c; }
+
+  /* ---------- Shared UI ---------- */
+  .topbar {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 22px;
+  }
+  .back-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--plum-800);
+    color: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+    font-size: 16px;
+  }
+  .back-btn:hover { border-color: var(--brass); }
+  .topbar-title { font-size: 19px; }
+
+  .card-btn {
+    background: var(--plum-800);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 20px;
+    display: flex; align-items: center; gap: 16px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--cream);
+    width: 100%;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .card-btn:hover { border-color: var(--brass); background: var(--plum-700); }
+  .card-btn .icon {
+    width: 46px; height: 46px; flex-shrink: 0;
+    border-radius: 12px;
+    background: rgba(201,161,90,.12);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card-btn .icon svg { width: 24px; height: 24px; }
+  .card-btn .label { font-family: 'Fraunces', serif; font-size: 17px; }
+  .card-btn .sub { font-size: 12.5px; color: var(--cream-dim); margin-top: 3px; }
+  .card-btn .chev { margin-left: auto; color: var(--cream-dim); }
+
+  .feature-btn {
+    padding: 28px 24px;
+    border-radius: 24px;
+    gap: 20px;
+  }
+  .feature-btn .icon {
+    width: 68px; height: 68px;
+    border-radius: 18px;
+  }
+  .feature-btn .icon svg { width: 36px; height: 36px; }
+  .feature-btn .label { font-size: 22px; }
+  .feature-btn .sub { font-size: 13.5px; margin-top: 5px; }
+  .feature-btn .chev { font-size: 22px; }
+
+  .primary-btn {
+    background: var(--brass);
+    color: #1c1420;
+    border: none;
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .primary-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .ghost-btn {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid var(--line);
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14.5px;
+    padding: 13px;
+    border-radius: 100px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .ghost-btn:hover { border-color: var(--brass); color: var(--brass); }
+
+  /* ---------- Main menu ---------- */
+  .greeting-eyebrow { font-size: 13px; color: var(--brass); margin-bottom: 4px; }
+  .greeting-name { font-size: 27px; margin-bottom: 26px; }
+  .section-label { font-size: 12.5px; color: var(--cream-dim); margin: 26px 0 10px; display: flex; align-items: center; gap: 8px; }
+  .section-label::before { content: ''; width: 12px; height: 1px; background: var(--brass); display: inline-block; }
+
+  /* ---------- Disclaimer ---------- */
+  .sheet {
+    margin-top: auto;
+    background: var(--plum-800);
+    border: 1px solid var(--line);
+    border-radius: 22px 22px 0 0;
+    padding: 26px 22px calc(26px + env(safe-area-inset-bottom, 0px));
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .sheet-grip { width: 40px; height: 4px; background: var(--line); border-radius: 4px; margin: -12px auto 6px; }
+  .perm-row { display: flex; gap: 12px; align-items: flex-start; }
+  .perm-row .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brass); margin-top: 7px; flex-shrink: 0; }
+
+  /* ---------- Capture ---------- */
+  .capture-visual {
+    aspect-ratio: 3/4;
+    border-radius: 20px;
+    border: 1.5px dashed var(--line);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    background: var(--plum-800);
+    margin-bottom: 18px;
+  }
+  .capture-visual img { width: 100%; height: 100%; object-fit: cover; }
+  .capture-visual .placeholder { color: var(--cream-dim); text-align: center; padding: 20px; font-size: 13.5px; }
+  .step-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; }
+  .step-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+  .step-dots span.done { background: var(--brass); }
+  .step-dots span.current { background: var(--blush); }
+
+  /* ---------- Haircut list ---------- */
+  .search-wrap { position: relative; margin-bottom: 18px; }
+  .search-wrap input {
+    width: 100%;
+    background: var(--plum-800);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 12px 16px 12px 40px;
+    color: var(--cream);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14px;
+  }
+  .search-wrap input::placeholder { color: var(--cream-dim); }
+  .search-wrap input:focus { outline: none; border-color: var(--brass); }
+  .search-wrap .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--cream-dim); }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-chip {
+    background: var(--plum-800);
+    border: 1px solid var(--line);
+    color: var(--cream-dim);
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 8px 15px;
+    border-radius: 100px;
+    cursor: pointer;
+  }
+  .filter-chip.active { background: var(--brass); color: #1c1420; border-color: var(--brass); }
+  .results-count { font-size: 12px; color: var(--cream-dim); margin-bottom: 12px; }
+
+  .cut-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 10px; }
+  .cut-card {
+    background: var(--plum-800);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .15s ease;
+  }
+  .cut-card:hover, .cut-card.selected { border-color: var(--brass); }
+  .cut-card .cut-icon { width: 100%; aspect-ratio: 1; border-radius: 12px; background: var(--plum-700); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+  .cut-card .cut-icon.cat-hombre { background: rgba(201,161,90,.14); }
+  .cut-card .cut-icon.cat-mujer { background: rgba(227,174,176,.14); }
+  .cut-card .cut-icon.cat-unisex { background: linear-gradient(135deg, rgba(201,161,90,.14), rgba(227,174,176,.14)); }
+  .cut-card .cut-icon svg { width: 60%; height: 60%; }
+  .cut-card .cut-name { font-size: 12.5px; font-weight: 500; }
+  .cut-card .cut-category { font-size: 10.5px; color: var(--cream-dim); margin-top: 1px; }
+  .empty-note { text-align: center; color: var(--cream-dim); font-size: 13.5px; padding: 30px 10px; }
+
+  /* ---------- Processing ---------- */
+  #screen-processing { align-items: center; justify-content: center; text-align: center; gap: 18px; }
+  .spinner {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    border: 3px solid var(--line);
+    border-top-color: var(--brass);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Result ---------- */
+  .result-image-wrap { position: relative; border-radius: 20px; overflow: hidden; margin-bottom: 16px; aspect-ratio: 3/4; background: var(--plum-800); }
+  .result-image-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .result-overlay { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light; opacity: .85; }
+  .result-badge { position: absolute; top: 10px; left: 10px; background: rgba(28,20,32,.75); backdrop-filter: blur(4px); color: var(--brass); font-size: 11px; padding: 5px 10px; border-radius: 100px; border: 1px solid var(--brass-dim); }
+  .disclaimer-box { background: var(--plum-800); border: 1px solid var(--line); border-radius: 14px; padding: 14px; font-size: 12.5px; color: var(--cream-dim); margin-bottom: 18px; line-height: 1.5; }
+  .disclaimer-box strong { color: var(--blush); }
+
+  input[type="file"] { display: none; }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  .grow { flex: 1; }
+</style>
+</head>
+<body>
+
+<div class="device" id="device">
+  <div class="notch"></div>
+
+  <!-- SPLASH -->
+  <section class="screen active" id="screen-splash">
+    <div class="brandmark">
+      <svg viewBox="0 0 64 64" fill="none">
+        <path d="M23 47 C23 41 23 38 23 38 C18 35.5 15.5 29.5 15.5 23 C15.5 12.5 22.5 5 32 5 C41.5 5 48.5 12.5 48.5 23 C48.5 30 45 35.5 40 38 L40 47" stroke="#c9a15a" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M15.5 22 C15.5 10.5 23 4 32.5 4.5 C43 5 48.5 13.5 47.5 22.5 C45 18 40 13.5 33.5 12.8 C26 12 19 15.5 17 23 Z" fill="#c9a15a"/>
+        <path d="M20 55 L44 55" stroke="#c9a15a" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1 class="brand-name">HOWULOOK</h1>
+    <p class="brand-tagline">En busca de tu mejor versión</p>
+    <button class="btn-start" onclick="goTo('menu')">Iniciar</button>
+  </section>
+
+  <!-- MAIN MENU -->
+  <section class="screen" id="screen-menu">
+    <p class="greeting-eyebrow" id="greeting-eyebrow">Buenos días</p>
+    <h2 class="greeting-name">¿Qué hacemos hoy?</h2>
+
+    <p class="section-label">Explorar</p>
+    <div class="stack">
+      <button class="card-btn feature-btn" onclick="startCortesFlow()">
+        <span class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#c9a15a" stroke-width="1.6"><path d="M6 19c0-4.5 2-8 6-8s6 3.5 6 8"/><path d="M6 10c0-3.8 2.5-6.5 6-6.5s6 2.7 6 6.5"/></svg>
+        </span>
+        <span>
+          <span class="label">Cortes de pelo</span>
+          <div class="sub">Previsualiza un nuevo estilo con IA</div>
+        </span>
+        <span class="chev">›</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- PERMISSION DISCLAIMER -->
+  <section class="screen" id="screen-permiso">
+    <div class="topbar">
+      <button class="back-btn" onclick="goTo('menu')">‹</button>
+      <span class="topbar-title">Cortes de pelo</span>
+    </div>
+    <p class="muted" style="margin-bottom:20px;">Para mostrarte cómo te quedaría un nuevo corte necesitamos una foto tuya.</p>
+
+    <div class="sheet">
+      <div class="sheet-grip"></div>
+      <h3 style="font-size:18px;">Permitir acceso</h3>
+      <div class="perm-row"><span class="dot"></span><p class="muted" style="font-size:13.5px;">Usaremos tu foto solo para generar la vista previa del corte. No se comparte ni se publica.</p></div>
+      <div class="perm-row"><span class="dot"></span><p class="muted" style="font-size:13.5px;">Puedes conceder acceso a la cámara, a la galería, o a ambas.</p></div>
+      <div class="stack" style="margin-top:8px;">
+        <button class="primary-btn" onclick="grantPermission('camera')">Permitir cámara</button>
+        <button class="primary-btn" onclick="grantPermission('gallery')" style="background:var(--plum-700); color:var(--cream); border:1px solid var(--line);">Permitir galería</button>
+        <button class="primary-btn" onclick="grantPermission('both')" style="background:transparent; color:var(--brass); border:1px solid var(--brass-dim);">Permitir ambas</button>
+        <button class="ghost-btn" onclick="goTo('menu')">Ahora no</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOURCE CHOICE (only if both permissions granted) -->
+  <section class="screen" id="screen-fuente">
+    <div class="topbar">
+      <button class="back-btn" onclick="goTo('menu')">‹</button>
+      <span class="topbar-title">Cortes de pelo</span>
+    </div>
+    <p class="muted" style="margin-bottom:22px;">¿Cómo quieres aportar tu foto esta vez?</p>
+    <div class="stack">
+      <button class="card-btn" onclick="beginCapture('camera')">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c9a15a" stroke-width="1.6"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13.5" r="3.2"/></svg></span>
+        <span><span class="label">Usar cámara</span><div class="sub">Hazte una foto ahora</div></span>
+        <span class="chev">›</span>
+      </button>
+      <button class="card-btn" onclick="beginCapture('gallery')">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c9a15a" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/><circle cx="8" cy="9" r="1.4" fill="#c9a15a" stroke="none"/></svg></span>
+        <span><span class="label">Usar galería</span><div class="sub">Elige fotos de tu dispositivo</div></span>
+        <span class="chev">›</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- CAPTURE FLOW -->
+  <section class="screen" id="screen-captura">
+    <div class="topbar">
+      <button class="back-btn" onclick="cancelCapture()">‹</button>
+      <span class="topbar-title" id="captura-title">Foto de frente</span>
+    </div>
+    <div class="step-dots" id="captura-dots"></div>
+    <div class="capture-visual" id="captura-visual">
+      <div class="placeholder">Todavía no hay foto seleccionada</div>
+    </div>
+    <p class="muted" id="captura-hint" style="font-size:13px; margin-bottom:18px; text-align:center;">Busca buena luz y mira directamente a la cámara.</p>
+    <div class="stack" style="margin-top:auto;">
+      <label class="primary-btn" style="display:block; text-align:center;" id="captura-btn-label">
+        Tomar foto
+        <input type="file" accept="image/*" id="captura-input">
+      </label>
+    </div>
+  </section>
+
+  <!-- POST-CAPTURE MENU -->
+  <section class="screen" id="screen-postcaptura">
+    <div class="topbar">
+      <button class="back-btn" onclick="goTo('menu')">‹</button>
+      <span class="topbar-title">Elige cómo continuar</span>
+    </div>
+    <div class="capture-visual" style="aspect-ratio:16/9; margin-bottom:24px;" id="postcaptura-preview"></div>
+    <div class="stack">
+      <button class="card-btn" onclick="goTo('lista-cortes')">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c9a15a" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h9"/></svg></span>
+        <span><span class="label">Elegir corte</span><div class="sub">Explora nuestro catálogo</div></span>
+        <span class="chev">›</span>
+      </button>
+      <button class="card-btn" onclick="goTo('origen-imagen-corte')">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c9a15a" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg></span>
+        <span><span class="label">Seleccionar corte de una imagen</span><div class="sub">Sube una foto del corte que te gusta</div></span>
+        <span class="chev">›</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- HAIRCUT LIST -->
+  <section class="screen" id="screen-lista-cortes">
+    <div class="topbar">
+      <button class="back-btn" onclick="goTo('postcaptura')">‹</button>
+      <span class="topbar-title">Elegir corte</span>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </span>
+      <input type="text" placeholder="Buscar corte..." id="cut-search" oninput="renderCuts()">
+    </div>
+    <div class="filter-row" id="filter-row"></div>
+    <p class="results-count" id="results-count"></p>
+    <div class="cut-grid" id="cut-grid"></div>
+  </section>
+
+  <!-- IMAGE SOURCE FOR CUT -->
+  <section class="screen" id="screen-origen-imagen-corte">
+    <div class="topbar">
+      <button class="back-btn" onclick="goTo('postcaptura')">‹</button>
+      <span class="topbar-title">Seleccionar corte de una imagen</span>
+    </div>
+    <p class="muted" style="margin-bottom:22px;">¿De dónde quieres tomar la imagen del corte que te gusta?</p>
+    <div class="stack">
+      <button class="card-btn" onclick="pickCutFromSource('gallery')">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c9a15a" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg></span>
+        <span><span class="label">Imagen de la galería</span><div class="sub">Requiere acceso a tus fotos</div></span>
+        <span class="chev">›</span>
+      </button>
+      <button class="card-btn" onclick="pickCutFromSource('files')">
+        <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#c9a15a" stroke-width="1.6"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 19h16"/></svg></span>
+        <span><span class="label">Imagen descargada</span><div class="sub">Elige un archivo de tu dispositivo</div></span>
+        <span class="chev">›</span>
+      </button>
+    </div>
+    <input type="file" accept="image/*" id="cut-gallery-input">
+    <input type="file" accept="image/*" id="cut-files-input">
+  </section>
+
+  <!-- PROCESSING -->
+  <section class="screen" id="screen-processing">
+    <div class="spinner"></div>
+    <h3 style="font-size:18px;">Generando tu vista previa</h3>
+    <p class="muted" style="font-size:13.5px; max-width:240px;">Estamos aplicando <span id="processing-cut-name">el corte</span> sin tocar el resto de tu foto.</p>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="screen-resultado">
+    <div class="topbar">
+      <button class="back-btn" onclick="goTo('menu')">‹</button>
+      <span class="topbar-title">Tu vista previa</span>
+    </div>
+    <div class="result-image-wrap">
+      <img id="result-image" alt="Resultado">
+      <div class="result-overlay" id="result-overlay"></div>
+      <span class="result-badge" id="result-badge">Corte aplicado</span>
+    </div>
+    <div class="disclaimer-box">
+      <strong>Nota de este prototipo:</strong> la superposición que ves ilustra dónde se aplicaría el nuevo corte. El cambio real de peinado, píxel a píxel, requiere conectar un modelo de IA de edición de imagen en el servidor — ese paso no está activo en esta demo interactiva.
+    </div>
+    <div class="stack">
+      <button class="primary-btn" onclick="goTo('postcaptura')">Probar otro corte</button>
+      <button class="ghost-btn" onclick="restartAll()">Volver al inicio</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ---------------- State ---------------- */
+const state = {
+  cameraPermission: null,   // null | 'granted' | 'denied'
+  galleryPermission: null,
+  captureSource: null,      // 'camera' | 'gallery'
+  photos: { front: null, right: null, left: null },
+  selectedCutName: null,
+  selectedCutImage: null,   // dataURL if picked from an image
+};
+
+try {
+  const saved = JSON.parse(localStorage.getItem('howulook-permissions') || '{}');
+  if (saved.cameraPermission) state.cameraPermission = saved.cameraPermission;
+  if (saved.galleryPermission) state.galleryPermission = saved.galleryPermission;
+} catch (e) { /* storage unavailable, continue without persisted permissions */ }
+
+function savePermissions() {
+  try {
+    localStorage.setItem('howulook-permissions', JSON.stringify({
+      cameraPermission: state.cameraPermission,
+      galleryPermission: state.galleryPermission,
+    }));
+  } catch (e) { /* ignore */ }
+}
+
+/* ---------------- Navigation ---------------- */
+const screenIds = ['splash','menu','permiso','fuente','captura','postcaptura','lista-cortes','origen-imagen-corte','processing','resultado'];
+function goTo(name) {
+  screenIds.forEach(id => document.getElementById('screen-' + id).classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  if (name === 'menu') setGreeting();
+  if (name === 'lista-cortes') renderCuts();
+}
+
+function setGreeting() {
+  const h = new Date().getHours();
+  const text = h < 12 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
+  document.getElementById('greeting-eyebrow').textContent = text;
+}
+
+/* ---------------- "Cortes de pelo" entry ---------------- */
+function startCortesFlow() {
+  const hasCamera = state.cameraPermission === 'granted';
+  const hasGallery = state.galleryPermission === 'granted';
+
+  if (!hasCamera && !hasGallery) {
+    goTo('permiso');
+    return;
+  }
+  if (hasCamera && hasGallery) {
+    goTo('fuente');
+    return;
+  }
+  beginCapture(hasCamera ? 'camera' : 'gallery');
+}
+
+function grantPermission(kind) {
+  if (kind === 'camera' || kind === 'both') state.cameraPermission = 'granted';
+  if (kind === 'gallery' || kind === 'both') state.galleryPermission = 'granted';
+  savePermissions();
+  startCortesFlow();
+}
+
+/* ---------------- Capture flow ---------------- */
+let captureSteps = [];
+let captureStepIndex = 0;
+
+function beginCapture(source) {
+  state.captureSource = source;
+  state.photos = { front: null, right: null, left: null };
+  captureStepIndex = 0;
+  captureSteps = source === 'camera'
+    ? [{ key: 'front', title: 'Foto de frente', hint: 'Busca buena luz y mira directamente a la cámara.', capture: 'user' }]
+    : [
+        { key: 'front', title: 'Foto de frente', hint: 'Elige una foto de tu cara, de frente.', capture: null },
+        { key: 'right', title: 'Perfil derecho', hint: 'Ahora una foto de tu perfil derecho.', capture: null },
+        { key: 'left',  title: 'Perfil izquierdo', hint: 'Por último, tu perfil izquierdo.', capture: null },
+      ];
+  renderCaptureStep();
+  goTo('captura');
+}
+
+function renderCaptureStep() {
+  const step = captureSteps[captureStepIndex];
+  document.getElementById('captura-title').textContent = step.title;
+  document.getElementById('captura-hint').textContent = step.hint;
+
+  const dotsEl = document.getElementById('captura-dots');
+  dotsEl.innerHTML = '';
+  if (captureSteps.length > 1) {
+    dotsEl.style.display = 'flex';
+    captureSteps.forEach((s, i) => {
+      const dot = document.createElement('span');
+      if (i < captureStepIndex) dot.className = 'done';
+      else if (i === captureStepIndex) dot.className = 'current';
+      dotsEl.appendChild(dot);
+    });
+  } else {
+    dotsEl.style.display = 'none';
+  }
+
+  const visual = document.getElementById('captura-visual');
+  const existing = state.photos[step.key];
+  visual.innerHTML = existing
+    ? `<img src="${existing}">`
+    : `<div class="placeholder">Todavía no hay foto seleccionada</div>`;
+
+  const input = document.getElementById('captura-input');
+  input.value = '';
+  if (step.capture) input.setAttribute('capture', step.capture);
+  else input.removeAttribute('capture');
+
+  document.getElementById('captura-btn-label').firstChild.textContent =
+    (state.captureSource === 'camera' ? 'Tomar foto' : 'Elegir de la galería') + ' ';
+}
+
+document.getElementById('captura-input').addEventListener('change', function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (ev) {
+    const step = captureSteps[captureStepIndex];
+    state.photos[step.key] = ev.target.result;
+    if (captureStepIndex < captureSteps.length - 1) {
+      captureStepIndex++;
+      renderCaptureStep();
+    } else {
+      showPostCapture();
+    }
+  };
+  reader.readAsDataURL(file);
+});
+
+function cancelCapture() {
+  goTo(state.cameraPermission === 'granted' && state.galleryPermission === 'granted' ? 'fuente' : 'menu');
+}
+
+function showPostCapture() {
+  const main = state.photos.front || state.photos.right || state.photos.left;
+  document.getElementById('postcaptura-preview').innerHTML = main ? `<img src="${main}" style="width:100%;height:100%;object-fit:cover;">` : '';
+  goTo('postcaptura');
+}
+
+/* ---------------- Haircut catalog ---------------- */
+const hombreCuts = [
+  'Buzz cut','Crew cut','Ivy League','Caesar cut','High and tight','Butch cut','Regulation cut',
+  'Brush cut','Flat top','Fade bajo','Fade medio','Fade alto','Skin fade','Taper fade','Drop fade',
+  'Burst fade','Temp fade','Undercut','Undercut con diseño','Disconnected undercut','Pompadour',
+  'Pompadour con fade','Quiff','Textured quiff','Slick back','Comb over','Side part','Faux hawk',
+  'Mohawk','Spiky hair','Man bun','Top knot','Curly fringe','Afro corto','Waves (360)','Cornrows',
+  'Dreadlocks cortos','Man braids','Mullet','Wolf cut hombre','Shag hombre','Textured crop',
+  'French crop','Line up / edge up','Widow\'s peak style','Long slick hair','Curtain bangs hombre',
+  'Bro flow','Surfer hair','Emo hair','Bowl cut','Mushroom cut',
+];
+const mujerCuts = [
+  'Bob clásico','Bob asimétrico','Lob','Pixie cut','Pixie largo','Shaggy pixie','Curly bob',
+  'Bob con flequillo','French bob','Blunt bob','Textured lob','Long layers','Butterfly cut',
+  'Wolf cut','Shag 70s','Curtain bangs','Flequillo cortina','Media melena','Melena XL',
+  'Ondas de playa','Rizos definidos','Afro voluminoso','Twist out','Box braids','Cornrows mujer',
+  'Trenza de espiga','Trenza holandesa','Media coleta','Coleta alta','Moño bajo','Moño desordenado',
+  'Chongo','Feathered layers','Face-framing layers','Bixie','Mullet mujer','Bettie bangs',
+  'Baby bangs','Side-swept bangs','Long bangs','V-cut','U-cut','Capas californianas',
+  'Liso planchado','Ondas suaves','Rizos afro cortos','Trenzas africanas largas',
+  'Half-up half-down','Espiral permanente','Melena con raya al medio','Flequillo recto',
+  'Balayage layered cut',
+];
+const unisexCuts = [
+  'Buzz cut unisex','Crop cut','Textured crop unisex','Curly crop','Fade unisex','Undercut unisex',
+  'Wolf cut unisex','Shag unisex','Long hair unisex','Man bun unisex','Braids unisex','Dreadlocks',
+  'Mohawk unisex','Afro unisex','Pixie unisex','Bowl cut unisex','Flequillo recto unisex',
+  'Curtain bangs unisex','Bob unisex','Buzzed sides long top','Two-block cut','Business cut',
+  'Ivy League unisex','Undercut trenzado','Waves unisex',
+];
+
+function inferTag(name, category) {
+  const n = name.toLowerCase();
+  const has = (...words) => words.some(w => n.includes(w));
+  if (has('braid','trenza','cornrow','dread')) return 'trenzado';
+  if (has('curly','rizo','afro','wave','onda','twist')) return 'rizado';
+  if (has('mullet','shag','wolf')) return 'atrevido';
+  if (has('bun','moño','chongo','coleta','ponytail','bob','lob','bowl','pixie')) return 'medio';
+  if (has('long','melena','liso','layers','capas','bangs','flequillo','fringe','curtain')) return 'largo';
+  if (has('pompadour','quiff','slick','comb over','side part','mohawk','faux hawk','ivy league')) return 'clásico';
+  if (has('buzz','crew','caesar','high and tight','butch','regulation','brush','flat top','fade','taper','undercut','spiky','crop')) return 'corto';
+  return category === 'mujer' ? 'largo' : category === 'unisex' ? 'medio' : 'corto';
+}
+
+const haircuts = [
+  ...hombreCuts.map(name => ({ name, category: 'hombre', tag: inferTag(name, 'hombre') })),
+  ...mujerCuts.map(name => ({ name, category: 'mujer', tag: inferTag(name, 'mujer') })),
+  ...unisexCuts.map(name => ({ name, category: 'unisex', tag: inferTag(name, 'unisex') })),
+];
+let selectedCategory = 'todos';
+
+function cutIconSvg(tag, accent) {
+  const hairShapes = {
+    corto: `<path d="M18 13C18 6 24 2 32 2C40 2 46 6 46 13C46 16.5 44 19 41 20.5C38.5 14.5 34.5 12 32 12C29.5 12 25.5 14.5 23 20.5C20 19 18 16.5 18 13Z" fill="${accent}"/>`,
+    'clásico': `<path d="M17 15C17 7 24 2 32 2C40 2 47 7 47 15C47 17 46 18.5 45 19.5C46 12 40 6 34 8C30 9 30 13 33 14C29 18 24 19 21 20.5C18.5 19 17 17.5 17 15Z" fill="${accent}"/>`,
+    medio: `<path d="M16 24C16 12 23 3 32 3C41 3 48 12 48 24C48 27 47 29.5 45.5 31C46 22 42 9 32 9C22 9 18 22 18.5 31C17 29.5 16 27 16 24Z" fill="${accent}"/>`,
+    largo: `<path d="M16 22C16 11 23 3 32 3C41 3 48 11 48 22C48 25 47 27 46 28.5C46 20 41 10 32 10C23 10 18 20 18 28.5C17 27 16 25 16 22Z" fill="${accent}"/>
+      <path d="M16 28C15 40 15 52 17 60C19 61 21 60 21 58C20 50 19 38 20 27Z" fill="${accent}"/>
+      <path d="M48 28C49 40 49 52 47 60C45 61 43 60 43 58C44 50 45 38 44 27Z" fill="${accent}"/>`,
+    rizado: `<circle cx="32" cy="21" r="19" fill="${accent}"/>`,
+    atrevido: `<path d="M18 15C18 7 24 2 32 2C40 2 46 7 46 15C46 17.5 45 19.5 43 21C41 15 37 12 32 12C27 12 23 15 21 21C19 19.5 18 17.5 18 15Z" fill="${accent}"/>
+      <path d="M19 24C18 34 18 44 19.5 50C21 51 23 50 23 48C22 42 21.5 33 22 25Z" fill="${accent}"/>
+      <path d="M45 24C46 34 46 44 44.5 50C43 51 41 50 41 48C42 42 42.5 33 42 25Z" fill="${accent}"/>`,
+    trenzado: `<path d="M18 14C18 7 24 2 32 2C40 2 46 7 46 14C46 17 44.5 19 42 20.5C39 14.5 35 12 32 12C29 12 25 14.5 22 20.5C19.5 19 18 17 18 14Z" fill="${accent}"/>
+      <path d="M20 22L18 52M26 24L25 56M38 24L39 56M44 22L46 52" stroke="${accent}" stroke-width="3" stroke-linecap="round"/>`,
+  };
+  const hair = hairShapes[tag] || hairShapes.corto;
+  return `
+    <ellipse cx="32" cy="41" rx="20" ry="4" fill="#000" opacity=".2"/>
+    <path d="M9 63C9 46 19 39 32 39C45 39 55 46 55 63Z" fill="#181019"/>
+    <rect x="26" y="30" width="12" height="12" rx="3" fill="#181019"/>
+    <ellipse cx="32" cy="23" rx="14" ry="16" fill="#181019"/>
+    <ellipse cx="25.5" cy="15" rx="4.5" ry="3" fill="#ffffff" opacity=".05"/>
+    ${hair}
+  `;
+}
+
+const categoryLabels = { todos: 'Todos', hombre: 'Hombre', mujer: 'Mujer', unisex: 'Unisex' };
+
+function renderFilterRow() {
+  const row = document.getElementById('filter-row');
+  row.innerHTML = '';
+  Object.keys(categoryLabels).forEach(key => {
+    const chip = document.createElement('button');
+    chip.className = 'filter-chip' + (selectedCategory === key ? ' active' : '');
+    chip.textContent = categoryLabels[key];
+    chip.onclick = () => { selectedCategory = key; renderCuts(); };
+    row.appendChild(chip);
+  });
+}
+
+function renderCuts() {
+  renderFilterRow();
+  const query = (document.getElementById('cut-search').value || '').toLowerCase().trim();
+  const grid = document.getElementById('cut-grid');
+  const filtered = haircuts.filter(c =>
+    c.name.toLowerCase().includes(query) &&
+    (selectedCategory === 'todos' || c.category === selectedCategory)
+  );
+  document.getElementById('results-count').textContent = `${filtered.length} cortes`;
+  grid.innerHTML = '';
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-note" style="grid-column:1/-1;">Ningún corte coincide con «${query}»</div>`;
+    return;
+  }
+  filtered.forEach(cut => {
+    const card = document.createElement('button');
+    card.className = 'cut-card';
+    const accent = cut.category === 'mujer' ? '#e3aeb0' : '#c9a15a';
+    card.innerHTML = `<div class="cut-icon cat-${cut.category}"><svg viewBox="0 0 64 64">${cutIconSvg(cut.tag, accent)}</svg></div><div class="cut-name">${cut.name}</div><div class="cut-category">${categoryLabels[cut.category]}</div>`;
+    card.onclick = () => confirmCutSelection(cut.name, null);
+    grid.appendChild(card);
+  });
+}
+
+/* ---------------- Select cut from an image ---------------- */
+function pickCutFromSource(source) {
+  if (source === 'gallery' && state.galleryPermission !== 'granted') {
+    state.galleryPermission = 'granted';
+    savePermissions();
+  }
+  const input = document.getElementById(source === 'gallery' ? 'cut-gallery-input' : 'cut-files-input');
+  input.click();
+}
+
+['cut-gallery-input', 'cut-files-input'].forEach(id => {
+  document.getElementById(id).addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (ev) {
+      confirmCutSelection('la imagen que subiste', ev.target.result);
+    };
+    reader.readAsDataURL(file);
+  });
+});
+
+/* ---------------- Processing + result ---------------- */
+function confirmCutSelection(name, imageDataUrl) {
+  state.selectedCutName = name;
+  state.selectedCutImage = imageDataUrl;
+  document.getElementById('processing-cut-name').textContent = name;
+  goTo('processing');
+  setTimeout(renderResult, 1600);
+}
+
+function renderResult() {
+  const base = state.photos.front || state.photos.right || state.photos.left;
+  const img = document.getElementById('result-image');
+  img.src = base || state.selectedCutImage || '';
+  document.getElementById('result-badge').textContent = state.selectedCutName;
+
+  const overlay = document.getElementById('result-overlay');
+  overlay.innerHTML = `
+    <svg viewBox="0 0 300 400" width="100%" height="100%" preserveAspectRatio="none">
+      <path d="M40 170 C40 70 100 20 150 20 C200 20 260 70 260 170 L260 210 C230 190 210 200 195 215 C185 150 165 120 150 120 C135 120 115 150 105 215 C90 200 70 190 40 210 Z"
+        fill="#c9a15a" opacity="0.28"/>
+    </svg>`;
+  goTo('resultado');
+}
+
+function restartAll() {
+  state.photos = { front: null, right: null, left: null };
+  state.selectedCutName = null;
+  state.selectedCutImage = null;
+  goTo('splash');
+  document.getElementById('screen-splash').classList.add('active');
+}
+
+/* init */
+setGreeting();
+</script>
+</body>
+</html>
